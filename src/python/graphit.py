@@ -6,9 +6,9 @@ import platform
 import pybind11
 import sys
 
-GRAPHIT_BUILD_DIRECTORY="${GRAPHIT_BUILD_DIRECTORY}".strip().rstrip("/")
-GRAPHIT_SOURCE_DIRECTORY="${GRAPHIT_SOURCE_DIRECTORY}".strip().rstrip("/")
-CXX_COMPILER="${CXX_COMPILER}".strip().rstrip("/")
+GRAPHIT_BUILD_DIRECTORY="/home/yh457/Develop/graphit-benchmark/build".strip().rstrip("/")
+GRAPHIT_SOURCE_DIRECTORY="/home/yh457/Develop/graphit-benchmark".strip().rstrip("/")
+CXX_COMPILER="/opt/rh/devtoolset-7/root/usr/bin/c++"
 
 PARALLEL_NONE=0
 PARALLEL_CILK=1
@@ -23,7 +23,7 @@ def compile_and_load(graphit_source_file, extern_cpp_files=[], linker_args=[], p
 	#module_filename_base = module_file.name
 	#module_file.close()
 	module_filename_base = os.path.splitext(graphit_source_file)[0]
-	module_name = os.path.basename(module_filename_base)    
+	module_name = os.path.basename(module_filename_base)
 	module_filename_base = "/tmp/" + module_name
 
 	# compile the file into a cpp file
@@ -45,7 +45,7 @@ def compile_and_load(graphit_source_file, extern_cpp_files=[], linker_args=[], p
 		compile_command += " -DCILK -fcilkplus "
 	elif parallelization_type == PARALLEL_OPENMP:
 		compile_command += " -DOPENMP -fopenmp "
-	
+
 	try:
 		subprocess.check_call(compile_command + module_filename_cpp + " -o " + module_filename_object, shell=True)
 	except subprocess.CalledProcessError as e:
@@ -57,7 +57,7 @@ def compile_and_load(graphit_source_file, extern_cpp_files=[], linker_args=[], p
 		object_filename = extern_file + ".o"
 		subprocess.check_call(compile_command + extern_file + " -o " + object_filename, shell=True)
 		extern_objects.append(object_filename)
-	
+
 	object_list = " " + " ".join(extern_objects) + " "
 	cmd = CXX_COMPILER + " -fPIC -shared -o " + module_filename_so + " " + module_filename_object + " -flto " + object_list
 
@@ -65,12 +65,12 @@ def compile_and_load(graphit_source_file, extern_cpp_files=[], linker_args=[], p
 	# append the python3 ldflag if it is macOS, don't need it for Linux
 	if platform.system() == "Darwin":
 		cmd = cmd + "-undefined dynamic_lookup"
-	
+
 	if parallelization_type == PARALLEL_CILK:
 		cmd += " -fcilkplus "
 	elif parallelization_type == PARALLEL_OPENMP:
 		cmd += " -fopenmp "
-			
+
 	if len(linker_args) > 0:
 		cmd += " " + " ".join(linker_args) + " "
 	subprocess.check_call(cmd, shell=True)
@@ -91,7 +91,7 @@ def compile_and_load_cache(graphit_source_file, extern_cpp_files=[], linker_args
 	#module_filename_base = module_file.name
 	#module_file.close()
 	module_filename_base = os.path.splitext(graphit_source_file)[0]
-	module_name = os.path.basename(module_filename_base)    
+	module_name = os.path.basename(module_filename_base)
 	module_filename_base = "/tmp/" + module_name
 
 	# compile the file into a cpp file
@@ -105,10 +105,10 @@ def compile_and_load_cache(graphit_source_file, extern_cpp_files=[], linker_args
 		module = importlib.util.module_from_spec(spec)
 		spec.loader.exec_module(module)
 		return module
-	
+
 	#else we just follow the normal routine
 	return compile_and_load(graphit_source_file, extern_cpp_files, linker_args, parallelization_type)
-	
+
 
 from scipy.sparse import csr_matrix
 def read_adjacency_tsv(file):

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
 project(graphit)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -77,7 +77,7 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/python_tests/pybind_test.py
 	VERBATIM
 )
 
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/graphit.py 
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/graphit.py
 	COMMAND sed -e s?\$\{GRAPHIT_SOURCE_DIRECTORY\}?${CMAKE_SOURCE_DIR}?g -e s?\$\{CXX_COMPILER\}?${CMAKE_CXX_COMPILER}?g -e s?\$\{GRAPHIT_BUILD_DIRECTORY\}?${CMAKE_BINARY_DIR}?g ${CMAKE_SOURCE_DIR}/src/python/graphit.py > ${CMAKE_BINARY_DIR}/graphit.py
 	DEPENDS ${CMAKE_SOURCE_DIR}/src/python/graphit.py
 	VERBATIM
